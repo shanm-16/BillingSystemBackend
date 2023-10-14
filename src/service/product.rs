@@ -3,6 +3,8 @@ use mongodb::bson::doc;
 use mongodb::Database;
 
 use crate::model::product::*;
+use crate::utils::random::*;
+
 
 pub async fn add_product(
     data: web::Json<ProductRequest>,
@@ -11,6 +13,7 @@ pub async fn add_product(
     let product_request = data.into_inner();
 
     let product = Product {
+        product_id: generate_random_string(10),
         merchant_id: product_request.merchant_id,
         product_name: product_request.product_name,
         price: product_request.price,

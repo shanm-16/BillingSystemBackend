@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize)]
 pub struct Product {
+    pub product_id: String,
     pub merchant_id: String,
     pub product_name: String,
     pub price: String,
