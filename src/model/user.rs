@@ -15,3 +15,10 @@ pub struct UserRequest {
     pub merchant_name: String,
     pub user_name: String,
 }
+
+#[derive(Deserialize, Serialize)]
+pub struct UserUpdateRequest {
+    pub password: String,
+    pub mode_of_login: String,
+    pub merchant_name: String,
+}
