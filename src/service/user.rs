@@ -1,39 +1,37 @@
-use actix_web::{web, Error, HttpResponse};
-use mongodb::bson::doc;
+use actix_web::{ HttpResponse, web, Error};
 use mongodb::Database;
+use mongodb::bson::doc;
 
 use crate::model::user::*;
+use crate::utils::random::*;
 
-pub async fn add_user(
-    data: web::Json<UserRequest>,
-    db: web::Data<Database>,
-) -> Result<HttpResponse, Error> {
-    let user_request = data.into_inner();
+
+pub async fn add_user(data: web::Json<UserRequest>, db: web::Data<Database>) -> Result<HttpResponse, Error> {
+    let user_request= data.into_inner();
 
     let user = User {
-        password: user_request.password,
-        mode_of_login: user_request.mode_of_login,
-        merchant_name: user_request.merchant_name,
-        user_name: user_request.user_name,
+        user_id : generate_random_string(10),
+        password : user_request.password,
+        mode_of_login : user_request.mode_of_login,
+        merchant_name : user_request.merchant_name,
+        user_name : user_request.user_name,
     };
-
+    
     let collection = db.collection::<User>("users");
 
     let insert_result = collection.insert_one(user, None).await;
 
     match insert_result {
         Ok(_) => Ok(HttpResponse::Ok().json("user added successfully")),
-        Err(_) => Err(actix_web::error::ErrorInternalServerError(
-            "Failed to add the user",
-        )),
+        Err(_) => Err(actix_web::error::ErrorInternalServerError("Failed to add the user")),
     }
 }
 
 pub async fn get_user_by_name(
-    path: web::Path<(String,)>,
-    db: web::Data<Database>,
+    path: web::Path<(String,)>,  
+    db: web::Data<Database>,    
 ) -> Result<HttpResponse, Error> {
-    let user_name = &path.0;
+    let user_name = &path.0; 
 
     // Get the users collection
     let collection = db.collection::<User>("users");
@@ -51,9 +49,7 @@ pub async fn get_user_by_name(
                 Ok(HttpResponse::NotFound().json("User not found"))
             }
         }
-        Err(_) => Err(actix_web::error::ErrorInternalServerError(
-            "Failed to find the user",
-        )),
+        Err(_) => Err(actix_web::error::ErrorInternalServerError("Failed to find the user")),
     }
 }
 
@@ -88,11 +84,11 @@ pub async fn update_user_by_name(
                 Ok(HttpResponse::NotFound().json("User not found"))
             }
         }
-        Err(_) => Err(actix_web::error::ErrorInternalServerError(
-            "Failed to update the user",
-        )),
+        Err(_) => Err(actix_web::error::ErrorInternalServerError("Failed to update the user")),
     }
 }
+
+
 
 pub async fn delete_user_by_name(
     path: web::Path<(String,)>,
@@ -115,8 +111,6 @@ pub async fn delete_user_by_name(
                 Ok(HttpResponse::NotFound().json("User not found"))
             }
         }
-        Err(_) => Err(actix_web::error::ErrorInternalServerError(
-            "Failed to delete the user",
-        )),
+        Err(_) => Err(actix_web::error::ErrorInternalServerError("Failed to delete the user")),
     }
 }
